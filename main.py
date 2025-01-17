@@ -1,5 +1,7 @@
 import time
 from functools import wraps
+from timeit import default_timer as timer
+import numpy as np
 
 """Julia set generator without optional PIL-based image drawing"""
 
@@ -17,6 +19,7 @@ def timefn(fn):
     return result
   return measure_time
 
+@timefn
 def calc_pure_python(desired_width, max_iterations):
   """Create a list of complex coordinates (zs) and complex parameters (cs),
   build Julia set"""
@@ -53,6 +56,7 @@ def calc_pure_python(desired_width, max_iterations):
   # It ensures that our code evolves exactly as we'd intended
   assert sum(output) == 33219980
 
+@timefn
 def calculate_z_serial_purepython(maxiter, zs, cs):
   """Calculate output list using Julia update rule"""
   output = [0] * len(zs)
@@ -66,8 +70,63 @@ def calculate_z_serial_purepython(maxiter, zs, cs):
     output[i] = n
   return output
 
+# Task 1.1: Calculate the Clock Granularity of different Python Timers
+
+def checktick_0():
+  M = 200
+  timesfound = np.empty((M,))
+  for i in range(M):
+    t1 =  time.time() # get timestamp from timer
+    t2 = time.time() # get timestamp from timer
+    while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+        t2 = time.time() # get timestamp from timer
+    t1 = t2 # this is outside the loop
+    timesfound[i] = t1 # record the time stamp
+  minDelta = 1000000
+  Delta = np.diff(timesfound) # it should be cast to int only when needed
+  minDelta = Delta.min()
+  return minDelta
+
+def checktick_1():
+  M = 200
+  timesfound = np.empty((M,))
+  for i in range(M):
+    t1 =  timer() # get timestamp from timer
+    t2 = timer() # get timestamp from timer
+    while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+        t2 = timer() # get timestamp from timer
+    t1 = t2 # this is outside the loop
+    timesfound[i] = t1 # record the time stamp
+  minDelta = 1000000
+  Delta = np.diff(timesfound) # it should be cast to int only when needed
+  minDelta = Delta.min()
+  return minDelta
+
+def checktick_2():
+  M = 200
+  timesfound = np.empty((M,))
+  for i in range(M):
+    t1 =  time.time_ns() # get timestamp from timer
+    t2 = time.time_ns() # get timestamp from timer
+    while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+        t2 = time.time_ns() # get timestamp from timer
+    t1 = t2 # this is outside the loop
+    timesfound[i] = t1 # record the time stamp
+  minDelta = 1000000
+  Delta = np.diff(timesfound) # it should be cast to int only when needed
+  minDelta = Delta.min()
+  return minDelta
+
+
+def task_1_1():
+  print("-----------------------------------")
+  print("-----Exercise 1: Profiling the Julia Set Code-----\n")
+  print("-----Task 1.1-----")
+  print("time.time() : ", checktick_0())
+  print("timeit : ", checktick_1())
+  print("time.time_ns() : ", checktick_2()/1000000000, "\n")
 
 if __name__ == "__main__":
-# Calculate the Julia set using a pure Python solution with
-# reasonable defaults for a laptop
-    calc_pure_python(desired_width=10000, max_iterations=300)
+  task_1_1()
+  print("-----Task 1.2-----")
+  calc_pure_python(desired_width=1000, max_iterations=300)
