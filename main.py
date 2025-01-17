@@ -19,7 +19,6 @@ def timefn(fn):
     return result
   return measure_time
 
-@timefn
 def calc_pure_python(desired_width, max_iterations):
   """Create a list of complex coordinates (zs) and complex parameters (cs),
   build Julia set"""
@@ -55,8 +54,9 @@ def calc_pure_python(desired_width, max_iterations):
   # This sum is expected for a 1000^2 grid with 300 iterations
   # It ensures that our code evolves exactly as we'd intended
   assert sum(output) == 33219980
+  return [zs, cs]
 
-@timefn
+
 def calculate_z_serial_purepython(maxiter, zs, cs):
   """Calculate output list using Julia update rule"""
   output = [0] * len(zs)
@@ -119,14 +119,40 @@ def checktick_2():
 
 
 def task_1_1():
-  print("-----------------------------------")
-  print("-----Exercise 1: Profiling the Julia Set Code-----\n")
-  print("-----Task 1.1-----")
+  print("------------------------------------------------------")
+  print("----------Exercise 1: Profiling the Julia Set Code----------\n")
+  print("-------------------------Task 1.1-------------------------")
   print("time.time() : ", checktick_0())
   print("timeit : ", checktick_1())
   print("time.time_ns() : ", checktick_2()/1000000000, "\n")
 
+# Task 1.2
+# decorator developed for task 1.2
+def timefn_1_2(fn):
+  @wraps(fn)
+  def measure_time(*args, **kwargs):
+    print("*********************************program output*********************************")
+    times = np.zeros(3, dtype=float)
+    for i in range(3):
+      t1 = timer()
+      result = fn(*args, **kwargs)
+      t2 = timer()
+      times[i] = t2-t1
+    print("*****************************end of program output*****************************")
+    print(f"@timefn_1_2: {fn.__name__} took {np.average(times)} seconds on average, with standard deviation {np.std(times)}")
+    return result
+  return measure_time
+
+def task_1_2():
+  print("-------------------------Task 1.2-------------------------")
+  print("Profiling calc_pure_python:")
+  test1 = timefn_1_2(calc_pure_python)
+  params2 = test1(desired_width=1000, max_iterations=300)
+  print("\n Profiling calculate_z_serial_purepython")
+  test2 = timefn_1_2(calculate_z_serial_purepython)
+  test2(300, params2[0], params2[1])
+  print("\n")
+
 if __name__ == "__main__":
   task_1_1()
-  print("-----Task 1.2-----")
-  calc_pure_python(desired_width=1000, max_iterations=300)
+  task_1_2()
