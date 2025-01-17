@@ -1,0 +1,15 @@
+----------Exercise 1: Profiling the Julia Set Code----------
+
+-------------------------Task 1.1-------------------------
+time.time() :  0.0003147125244140625
+timeit :  1.9999970390927047e-07
+time.time_ns() :  0.000310016 
+
+-------------------------Task 1.2-------------------------
+Profiling calc_pure_python:
+@timefn_1_2: calc_pure_python took 3.758921333333395 seconds on average, with standard deviation 0.007134120240156598
+
+ Profiling calculate_z_serial_purepython
+@timefn_1_2: calculate_z_serial_purepython took 3.5490096333329952 seconds on average, with standard deviation 0.005809200798966821
+-------------------------Task 1.3-------------------------
+snakeviz calc_pure_python

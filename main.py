@@ -2,6 +2,8 @@ import time
 from functools import wraps
 from timeit import default_timer as timer
 import numpy as np
+import cProfile
+import subprocess
 
 """Julia set generator without optional PIL-based image drawing"""
 
@@ -71,7 +73,7 @@ def calculate_z_serial_purepython(maxiter, zs, cs):
   return output
 
 # Task 1.1: Calculate the Clock Granularity of different Python Timers
-
+outfile = None
 def checktick_0():
   M = 200
   timesfound = np.empty((M,))
@@ -119,40 +121,59 @@ def checktick_2():
 
 
 def task_1_1():
-  print("------------------------------------------------------")
-  print("----------Exercise 1: Profiling the Julia Set Code----------\n")
-  print("-------------------------Task 1.1-------------------------")
-  print("time.time() : ", checktick_0())
-  print("timeit : ", checktick_1())
-  print("time.time_ns() : ", checktick_2()/1000000000, "\n")
+  print("----------Exercise 1: Profiling the Julia Set Code----------\n", file=outfile)
+  print("-------------------------Task 1.1-------------------------", file=outfile)
+  print("time.time() : ", checktick_0(), file=outfile)
+  print("timeit : ", checktick_1(), file=outfile)
+  print("time.time_ns() : ", checktick_2()/1000000000, "\n", file=outfile)
 
 # Task 1.2
 # decorator developed for task 1.2
 def timefn_1_2(fn):
   @wraps(fn)
   def measure_time(*args, **kwargs):
-    print("*********************************program output*********************************")
     times = np.zeros(3, dtype=float)
     for i in range(3):
       t1 = timer()
       result = fn(*args, **kwargs)
       t2 = timer()
       times[i] = t2-t1
-    print("*****************************end of program output*****************************")
-    print(f"@timefn_1_2: {fn.__name__} took {np.average(times)} seconds on average, with standard deviation {np.std(times)}")
+    print(f"@timefn_1_2: {fn.__name__} took {np.average(times)} seconds on average, with standard deviation {np.std(times)}", file=outfile)
     return result
   return measure_time
 
+params_zfunc = []
+
 def task_1_2():
-  print("-------------------------Task 1.2-------------------------")
-  print("Profiling calc_pure_python:")
+  print("-------------------------Task 1.2-------------------------", file=outfile)
+  print("Profiling calc_pure_python:", file=outfile)
   test1 = timefn_1_2(calc_pure_python)
   params2 = test1(desired_width=1000, max_iterations=300)
-  print("\n Profiling calculate_z_serial_purepython")
+  print("\n Profiling calculate_z_serial_purepython", file=outfile)
   test2 = timefn_1_2(calculate_z_serial_purepython)
   test2(300, params2[0], params2[1])
   print("\n")
+  return params2
 
+# Task 1.3
+def func_to_run():
+    return calculate_z_serial_purepython(300, params_zfunc[0], params_zfunc[1])
+
+def task_1_3():
+  print("-------------------------Task 1.3-------------------------", file=outfile)
+  cProfile.run('calc_pure_python(desired_width=1000, max_iterations=300)', filename='profile0.stats')
+  runnable = 'func_to_run()'
+  cProfile.run(runnable, filename='profile1.stats')
+  print("snakeviz calc_pure_python", file=outfile)
+  out1 = subprocess.check_output(["python", "-m", "snakeviz", "profile0.stats", "--server", ">", "profile0.txt"], shell=True, timeout=10)
+  print(out1)
+  print("snakeviz calculate_z_serial_purepython", file=outfile)
+  out2 = subprocess.check_output(["python", "-m", "snakeviz", "profile1.stats", "--server", ">", "profile1.txt"], shell=True, timeout=10)
+  print(out2)
+  
 if __name__ == "__main__":
+  outfile = open("out.txt", "w")
   task_1_1()
-  task_1_2()
+  params_zfunc = task_1_2()
+  task_1_3()
+  outfile.close()
