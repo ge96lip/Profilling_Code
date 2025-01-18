@@ -17,7 +17,6 @@ def timefn(fn):
         return result
     return measure_time
 
-
 def calc_pure_python(desired_width, max_iterations):
     """Create a list of complex coordinates (zs) and complex parameters (cs),
     build Julia set"""
@@ -54,8 +53,11 @@ def calc_pure_python(desired_width, max_iterations):
 
     # This sum is expected for a 1000^2 grid with 300 iterations
     # It ensures that our code evolves exactly as we'd intended
-    assert sum(output) == 33219980
-
+    print("new sum: ", sum(output))
+    assert sum(output) == 334236
+    # assert sum(output) == 33219980
+    
+@profile
 def calculate_z_serial_purepython(maxiter, zs, cs):
     """Calculate output list using Julia update rule"""
     output = [0] * len(zs)
@@ -72,4 +74,7 @@ def calculate_z_serial_purepython(maxiter, zs, cs):
 if __name__ == "__main__":
     # Calculate the Julia set using a pure Python solution with
     # reasonable defaults for a laptop
-    calc_pure_python(desired_width=10000, max_iterations=300) 
+    # Task 1.1 - 1.3: 
+    # calc_pure_python(desired_width=100, max_iterations=300) 
+    # Task 1.4: 
+    calc_pure_python(desired_width=100, max_iterations=300) 

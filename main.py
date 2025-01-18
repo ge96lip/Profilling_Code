@@ -4,7 +4,7 @@ from timeit import default_timer as timer
 import numpy as np
 import cProfile
 import subprocess
-
+NAME = "carlotta"
 """Julia set generator without optional PIL-based image drawing"""
 
 # area of complex space to investigate
@@ -75,49 +75,58 @@ def calculate_z_serial_purepython(maxiter, zs, cs):
 # Task 1.1: Calculate the Clock Granularity of different Python Timers
 outfile = None
 def checktick_0():
-  M = 200
-  timesfound = np.empty((M,))
-  for i in range(M):
-    t1 =  time.time() # get timestamp from timer
-    t2 = time.time() # get timestamp from timer
-    while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+    """
+    time.time(): precision is approximately ± 1 microsecond
+    """
+    M = 200
+    timesfound = np.empty((M,))
+    for i in range(M):
+        t1 =  time.time() # get timestamp from timer
         t2 = time.time() # get timestamp from timer
-    t1 = t2 # this is outside the loop
-    timesfound[i] = t1 # record the time stamp
-  minDelta = 1000000
-  Delta = np.diff(timesfound) # it should be cast to int only when needed
-  minDelta = Delta.min()
-  return minDelta
+        while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+            t2 = time.time() # get timestamp from timer
+        t1 = t2 # this is outside the loop
+        timesfound[i] = t1 # record the time stamp
+    minDelta = 1000000
+    Delta = np.diff(timesfound) # it should be cast to int only when needed
+    minDelta = Delta.min()
+    return minDelta
 
 def checktick_1():
-  M = 200
-  timesfound = np.empty((M,))
-  for i in range(M):
-    t1 =  timer() # get timestamp from timer
-    t2 = timer() # get timestamp from timer
-    while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+    """
+    timeit: higher resolution, lower clock granularity
+    """
+    M = 200
+    timesfound = np.empty((M,))
+    for i in range(M):
+        t1 =  timer() # get timestamp from timer
         t2 = timer() # get timestamp from timer
-    t1 = t2 # this is outside the loop
-    timesfound[i] = t1 # record the time stamp
-  minDelta = 1000000
-  Delta = np.diff(timesfound) # it should be cast to int only when needed
-  minDelta = Delta.min()
-  return minDelta
+        while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+            t2 = timer() # get timestamp from timer
+        t1 = t2 # this is outside the loop
+        timesfound[i] = t1 # record the time stamp
+    minDelta = 1000000
+    Delta = np.diff(timesfound) # it should be cast to int only when needed
+    minDelta = Delta.min()
+    return minDelta
 
 def checktick_2():
-  M = 200
-  timesfound = np.empty((M,))
-  for i in range(M):
-    t1 =  time.time_ns() # get timestamp from timer
-    t2 = time.time_ns() # get timestamp from timer
-    while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+    """
+    higher resolution in nanoseconds
+    """
+    M = 200
+    timesfound = np.empty((M,))
+    for i in range(M):
+        t1 =  time.time_ns() # get timestamp from timer
         t2 = time.time_ns() # get timestamp from timer
-    t1 = t2 # this is outside the loop
-    timesfound[i] = t1 # record the time stamp
-  minDelta = 1000000
-  Delta = np.diff(timesfound) # it should be cast to int only when needed
-  minDelta = Delta.min()
-  return minDelta
+        while (t2 - t1) < 1e-16: # if zero then we are below clock granularity, retake timing
+            t2 = time.time_ns() # get timestamp from timer
+        t1 = t2 # this is outside the loop
+        timesfound[i] = t1 # record the time stamp
+    minDelta = 1000000
+    Delta = np.diff(timesfound) # it should be cast to int only when needed
+    minDelta = Delta.min()
+    return minDelta
 
 
 def task_1_1():
@@ -161,19 +170,22 @@ def func_to_run():
 
 def task_1_3():
   print("-------------------------Task 1.3-------------------------", file=outfile)
-  cProfile.run('calc_pure_python(desired_width=1000, max_iterations=300)', filename='profile0.stats')
+  cProfile.run('calc_pure_python(desired_width=1000, max_iterations=300)', filename=f'profile0_{NAME}.stats')
   runnable = 'func_to_run()'
-  cProfile.run(runnable, filename='profile1.stats')
+  cProfile.run(runnable, filename=f'profile1_{NAME}.stats')
   print("snakeviz calc_pure_python", file=outfile)
-  out1 = subprocess.check_output(["python", "-m", "snakeviz", "profile0.stats", "--server", ">", "profile0.txt"], shell=True, timeout=10)
+  out1 = subprocess.check_output(["python", "-m", "snakeviz", f"profile0_{NAME}.stats", "--server", ">", f"profile0_{NAME}.txt"], shell=True, timeout=10)
   print(out1)
   print("snakeviz calculate_z_serial_purepython", file=outfile)
-  out2 = subprocess.check_output(["python", "-m", "snakeviz", "profile1.stats", "--server", ">", "profile1.txt"], shell=True, timeout=10)
+  out2 = subprocess.check_output(["python", "-m", "snakeviz", f"profile1_{NAME}.stats", "--server", ">", f"profile1_{NAME}.txt"], shell=True, timeout=10)
   print(out2)
   
 if __name__ == "__main__":
-  outfile = open("out.txt", "w")
-  task_1_1()
-  params_zfunc = task_1_2()
-  task_1_3()
-  outfile.close()
+    outfile = open(f"out_{NAME}.txt", "w")
+    print("-------------------------Task 1.1-------------------------")
+    task_1_1()
+    print("-------------------------Task 1.2-------------------------")
+    params_zfunc = task_1_2()
+    print("-------------------------Task 1.3-------------------------")
+    task_1_3()
+    outfile.close()
