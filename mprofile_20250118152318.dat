@@ -1,0 +1,4 @@
+FUNC __main__.calculate_z_serial_purepython 44.1562 1737210198.5780 44.1875 1737210198.6118 0
+CMDLINE /Users/carlottaholzle/Desktop/Profilling_Code/.venv/bin/python JuliaSet.py
+MEM 0.187500 1737210198.4252
+MEM 36.203125 1737210198.5304

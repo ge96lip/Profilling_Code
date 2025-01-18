@@ -1,5 +1,6 @@
-grid_shape = (640, 640)
-
+grid_shape = (320, 320)
+#grid_shape = (640, 640)
+@profile
 def evolve(grid, dt, D=1.0):
     xmax, ymax = grid_shape
     new_grid = [[0.0] * ymax for x in range(xmax)]
@@ -14,7 +15,7 @@ def evolve(grid, dt, D=1.0):
             new_grid[i][j] = grid[i][j] + D * (grid_xx + grid_yy) * dt
     return new_grid
 
-# @profile
+
 def run_experiment(num_iterations):
     # Setting up initial conditions 
     xmax, ymax = grid_shape
