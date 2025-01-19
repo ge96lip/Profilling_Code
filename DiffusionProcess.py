@@ -1,5 +1,5 @@
-grid_shape = (320, 320)
-#grid_shape = (640, 640)
+# grid_shape = (320, 320)
+grid_shape = (640, 640)
 @profile
 def evolve(grid, dt, D=1.0):
     xmax, ymax = grid_shape
@@ -34,9 +34,4 @@ def run_experiment(num_iterations):
         grid = evolve(grid, 0.1)
 
 if __name__ == "__main__":
-    # Calculate the Julia set using a pure Python solution with
-    # reasonable defaults for a laptop
-    # Task 1.1 - 1.3: 
-    # calc_pure_python(desired_width=100, max_iterations=300) 
-    # Task 1.4: 
     run_experiment(5)
