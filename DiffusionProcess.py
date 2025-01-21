@@ -1,5 +1,5 @@
-# grid_shape = (320, 320)
-grid_shape = (640, 640)
+grid_shape = (320, 320)
+# grid_shape = (640, 640)
 @profile
 def evolve(grid, dt, D=1.0):
     xmax, ymax = grid_shape
