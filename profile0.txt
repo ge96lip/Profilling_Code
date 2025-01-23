@@ -1,4 +1,0 @@
-snakeviz web server started on 127.0.0.1:8080; enter Ctrl-C to exit
-http://127.0.0.1:8080/snakeviz/C%3A%5CUsers%5Crmare%5COneDrive%5CDesktop%5CHPC_1%5CProfilling_Code%5Cprofile0.stats
-
-Bye!
